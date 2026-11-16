@@ -459,6 +459,35 @@ const Store = (() => {
       return order;
     },
 
+    /* Fix the payment method after billing (e.g. saved as Cash but the customer paid by bKash).
+       Sales stay the same; only how they were paid changes, so the cash drawer and the
+       Reports payment split follow. Every change is kept in order.payChanges. */
+    async changePayment(order, { payMethod, received, ref, reason }) {
+      if (order.status !== 'paid') throw new Error(order.status === 'void' ? 'Voided orders cannot be changed' : 'Take the payment first');
+      if (order.payMethod === 'Complimentary' || !(U.n(order.total) > 0)) throw new Error('This order is fully complimentary: there is no payment to change');
+      const pm = String(payMethod || '').trim();
+      if (!pm || pm === 'Complimentary') throw new Error('Choose a payment method');
+      const total = U.n(order.total);
+      const got = pm === 'Cash' ? (received === '' || received == null ? total : U.n(received)) : total;
+      if (pm === 'Cash' && got < total) throw new Error('Cash received is less than the total');
+      const trx = String(ref || '').trim();
+      if (pm === order.payMethod && got === U.n(order.received) && !trx) throw new Error('Nothing to change');
+      const parts = String(order.note || '').split(' · ').filter(Boolean);
+      const oldTrx = parts.filter((p) => p.startsWith('TrxID: ')).map((p) => p.slice(7)).join(', ');
+      order.payChanges = [...(order.payChanges || []), {
+        at: new Date().toISOString(), from: order.payMethod, to: pm,
+        fromReceived: U.n(order.received), fromChange: U.n(order.change), fromTrx: oldTrx, reason: String(reason || '').trim(),
+      }];
+      order.payMethod = pm;
+      order.received = got;
+      order.change = pm === 'Cash' ? got - total : 0;
+      // The old TrxID belongs to the old payment.
+      order.note = [...parts.filter((p) => !p.startsWith('TrxID: ')), trx ? `TrxID: ${trx}` : ''].filter(Boolean).join(' · ');
+      await DB.put('orders', order);
+      api.changed('orders');
+      return order;
+    },
+
     async markKitchenPrinted(order) {
       order.kitchenAt = new Date().toISOString();
       await DB.put('orders', order);

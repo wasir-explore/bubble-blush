@@ -65,7 +65,7 @@ Views.orders = (() => {
         <td class="wrap">${o.lines.map((l) => `${l.qty}× ${U.esc(l.name)}${l.sizeName ? ` <small>(${U.esc(l.sizeName)})</small>` : ''}${l.parcel ? ' 🥡' : ''}${Store.isFreeCup(l) ? ' <b class="comp-tag">🎁 free</b>' : ''}`).join(', ')}</td>
         <td>${U.esc(o.orderType)}</td>
         <td>${U.esc(o.customerName || '')}${o.customerPhone ? `<br><small>${U.esc(o.customerPhone)}</small>` : ''}</td>
-        <td>${o.status === 'unpaid' ? '<span class="badge out">Not paid</span>' : U.esc(o.payMethod)}</td>
+        <td>${o.status === 'unpaid' ? '<span class="badge out">Not paid</span>' : U.esc(o.payMethod)}${o.payChanges?.length ? ` <span title="Changed from ${U.esc(o.payChanges[0].from)}">💳</span>` : ''}</td>
         <td class="r"><b>${U.money(o.total)}</b>${o.discount ? `<br><small class="muted">-${U.money(o.discount)} disc.</small>` : ''}${o.comp ? `<br><small class="muted">🎁 -${U.money(o.comp)}</small>` : ''}</td>
         <td>${o.status === 'void' ? '<span class="badge out">Void</span>' : o.ready ? '<span class="badge ok">Served</span>' : '<span class="badge low">Making</span>'}</td>
       </tr>`).join('')}</tbody>`;
@@ -91,6 +91,7 @@ Views.orders = (() => {
       body: `
         ${o.status === 'void' ? `<div class="banner low">Voided ${U.fmtDateTime(o.voidAt)}${o.voidReason ? ' — ' + U.esc(o.voidReason) : ''}${o.restocked ? ' (stock returned)' : ''}</div>` : ''}
         ${(o.moved || []).map((mv) => `<div class="banner info">📅 Entered on ${U.fmtDay(mv.fromDay)} as #${mv.fromNo} (${U.fmtTime(mv.fromAt)}), moved to ${U.fmtDay(mv.toDay)} on ${U.fmtDateTime(mv.movedAt)}.</div>`).join('')}
+        ${(o.payChanges || []).map((c) => `<div class="banner info">💳 Payment changed from <b>${U.esc(c.from)}</b>${c.from === 'Cash' ? ` (received ${U.money(c.fromReceived)})` : ''}${c.fromTrx ? ` (TrxID ${U.esc(c.fromTrx)})` : ''} to <b>${U.esc(c.to)}</b> on ${U.fmtDateTime(c.at)}${c.reason ? ' — ' + U.esc(c.reason) : ''}.</div>`).join('')}
         ${o.status === 'unpaid' ? '<div class="banner warn">💰 Not paid yet: the kitchen copy went first. Press <b>Take payment</b> when the customer pays.</div>' : ''}
         <div class="kv"><span>Type</span><b>${U.esc(o.orderType)}</b><span>Payment</span><b>${o.status === 'unpaid' ? 'Not paid yet' : U.esc(o.payMethod)}</b>
           ${o.customerName || o.customerPhone ? `<span>Customer</span><b>${U.esc(o.customerName)} ${U.esc(o.customerPhone)}</b>` : ''}
@@ -113,6 +114,7 @@ Views.orders = (() => {
       actions: [
         ...(o.status !== 'void' ? [{ label: 'Void order', cls: 'danger', left: true, onClick: () => voidFlow(o) }] : []),
         ...(o.status === 'paid' ? [{ label: '📅 Move to another day', left: true, onClick: (dm) => { moveFlow(o, dm); return false; } }] : []),
+        ...(canChangePay(o) ? [{ label: '💳 Change payment', left: true, onClick: (dm) => { payFlow(o, dm); return false; } }] : []),
         ...(o.status !== 'void' ? [{ label: o.ready ? 'Mark making' : 'Mark served', onClick: async () => { await Store.setReady(o, !o.ready); draw(); } }] : []),
         ...(Store.settings.stickersEnabled ? [{ label: '🏷 All stickers', onClick: () => { Print.stickers(o); return false; } }] : []),
         { label: '👩‍🍳 Kitchen copy', onClick: async () => { const r = await Print.kitchen(o, { reprint: !!o.kitchenAt }); if (r && r.ok) await Store.markKitchenPrinted(o); return false; } },
@@ -170,6 +172,60 @@ Views.orders = (() => {
     };
     inp.addEventListener('input', upd);
     md.el.addEventListener('click', (e) => { const b = e.target.closest('[data-d]'); if (b) { inp.value = b.dataset.d; upd(); } });
+    upd();
+  }
+
+  const canChangePay = (o) => o.status === 'paid' && o.payMethod !== 'Complimentary' && U.n(o.total) > 0;
+
+  /* Saved as Cash but the customer paid by bKash (or the other way round)? Fix it here.
+     The sale stays the same; the cash drawer and the Reports payment split follow. */
+  async function payFlow(o, detail) {
+    if (!(await App.requirePin('Changing how an order was paid needs the manager PIN.'))) return;
+    const methods = [...new Set([...(Store.settings.payMethods || []).filter((m) => m !== 'Complimentary'), o.payMethod])];
+    let method = methods.find((m) => m !== o.payMethod) || o.payMethod;
+    const closed = (await DB.all('dayCloses')).find((c) => c.id === o.dayKey);
+    const isWallet = (m) => /bkash|nagad|rocket|upay/i.test(m);
+    const md = U.modal({
+      title: `💳 Change payment · Order #${o.no}`,
+      body: `<div class="pay-total"><span>Order total</span><b>${U.money(o.total)}</b></div>
+        <p>Saved as <b>${U.esc(o.payMethod)}</b>${o.payMethod === 'Cash' ? ` (received ${U.money(o.received)}, change ${U.money(o.change)})` : ''}. Pick how the customer really paid.</p>
+        <div class="opt-group"><label>Paid by</label>${U.seg('cpm', methods, method)}</div>
+        <div class="opt-group" id="cpCash"><label>Cash received</label><input type="number" id="cpIn" min="0" placeholder="${o.total}"><div class="change" id="cpOut"></div></div>
+        <div class="opt-group" id="cpRef"><label>Transaction ID (optional)</label><input type="text" id="cpTrx" placeholder="bKash / Nagad TrxID"></div>
+        <div class="opt-group"><label>Reason (optional)</label><input type="text" id="cpWhy" placeholder="Pressed Cash by mistake, customer paid by bKash…"></div>
+        <label class="check"><input type="checkbox" id="cpPrint"> 🧾 Print the corrected bill</label>
+        <div id="cpWarn"></div>`,
+      actions: [{ label: 'Cancel' }, { label: 'Save payment', cls: 'primary', onClick: async (m) => {
+        const from = o.payMethod;
+        try {
+          await Store.changePayment(o, {
+            payMethod: method, received: U.$('#cpIn', m.el).value, ref: isWallet(method) ? U.$('#cpTrx', m.el).value : '', reason: U.$('#cpWhy', m.el).value,
+          });
+        } catch (err) { U.toast(err.message || String(err), 'err'); return false; }
+        U.toast(`Order #${o.no}: ${from} → ${o.payMethod}`, 'ok', 4000);
+        const doPrint = U.$('#cpPrint', m.el).checked;
+        detail?.close();
+        draw();
+        openOrder(o);
+        if (doPrint) await Print.receipt(o, { reprint: true });
+        return true;
+      } }],
+    });
+    const cashIn = U.$('#cpIn', md.el);
+    const upd = () => {
+      U.$('#cpCash', md.el).hidden = method !== 'Cash';
+      U.$('#cpRef', md.el).hidden = !isWallet(method);
+      const out = U.$('#cpOut', md.el);
+      const r = U.n(cashIn.value);
+      out.innerHTML = !cashIn.value ? '' : r >= o.total ? `Change: <b>${U.money(r - o.total)}</b>` : `<span class="err">Short by ${U.money(o.total - r)}</span>`;
+      const cashMove = (o.payMethod === 'Cash') !== (method === 'Cash');
+      U.$('#cpWarn', md.el).innerHTML = [
+        cashMove ? `<div class="banner low">💵 Expected cash in the drawer for ${U.fmtDay(o.dayKey)} goes ${method === 'Cash' ? 'up' : 'down'} by ${U.money(o.total)}.</div>` : '',
+        closed && cashMove ? `<div class="banner warn">🔒 ${U.fmtDay(o.dayKey)} was already closed. Afterwards, open Reports for that day, press <b>✓ Day closed — view</b> and <b>Update &amp; finish</b> to save and reprint the new totals.</div>` : '',
+      ].join('');
+    };
+    U.bindSeg(md.el, 'cpm', (v) => { method = v; upd(); });
+    cashIn.addEventListener('input', upd);
     upd();
   }
 
