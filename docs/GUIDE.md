@@ -94,7 +94,7 @@ Print the **[opening & closing worksheet](opening-closing-worksheet.html)** for 
 
 ## 5. Weekly / monthly
 
-- **Weekly**: run an Inventory **Stock count**, then use **Shopping list → Copy for WhatsApp** to send it to your supplier.
+- **Weekly**: run an Inventory **Stock count**, then use **Shopping list → Copy for WhatsApp** to send it to your supplier. Print the **[inventory sheet](inventory-sheet.html)** to count on paper first: page 1 lists every ingredient with its pack size and reorder level, page 2 is a log for stock received and waste during the week.
 - **Weekly**: Reports → *Last 7 days*. Check best/slowest sellers, busy hours, and topping attach rate.
 - **Monthly**: add rent, salaries, and electricity in Expenses. Reports → *This month* shows your real **net profit**.
 - **When supplier prices change**: record purchases with the real price. Average costs update automatically, and Menu & Pricing shows which drinks need a new price.

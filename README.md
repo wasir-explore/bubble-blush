@@ -8,6 +8,7 @@ Business toolkit for **Bubble Blush**, a bubble tea shop in Khulna, Bangladesh.
 | `brand/` | Logo and brand colours |
 | `docs/GUIDE.md` | Setup, printers, daily routine, and how to calibrate menu prices |
 | `docs/opening-closing-worksheet.html` | Printable A4 daily worksheet: opening on page 1, closing on page 2 |
+| `docs/inventory-sheet.html` | Printable A4 weekly inventory sheet: stock count on page 1, purchases and waste log on page 2 |
 
 ## Bubble Blush POS — quick start (Windows 10 or 11)
 
