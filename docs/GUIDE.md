@@ -58,6 +58,8 @@ With the **fast print** shortcut, stickers skip the print window and go to the *
 
 ## 4. Daily routine
 
+Print the **[opening & closing worksheet](opening-closing-worksheet.html)** for each day: open the file in Edge, press **Ctrl+P**, choose A4 and two-sided if your printer supports it. Page 1 is the opening checklist, prep log and float count. Page 2 is the closing checklist, cash count and drawer check. Staple the Z-report to it and keep the sheets in a file.
+
 **Opening**
 - Open the POS. Count the coins and notes in the drawer (the *opening float*).
 - Check the low-stock banner. Prepare pearls for the day.

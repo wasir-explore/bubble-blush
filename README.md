@@ -7,6 +7,7 @@ Business toolkit for **Bubble Blush**, a bubble tea shop in Khulna, Bangladesh.
 | `pos/` | **Bubble Blush POS**: offline point-of-sale for Windows 10 and 11 (orders, bill + cup-sticker printing, inventory, expenses, reports) |
 | `brand/` | Logo and brand colours |
 | `docs/GUIDE.md` | Setup, printers, daily routine, and how to calibrate menu prices |
+| `docs/opening-closing-worksheet.html` | Printable A4 daily worksheet: opening on page 1, closing on page 2 |
 
 ## Bubble Blush POS — quick start (Windows 10 or 11)
 

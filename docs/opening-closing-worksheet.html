@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Bubble Blush · Opening &amp; Closing Worksheet</title>
+<!--
+  Daily opening and closing worksheet for the counter.
+  Open this file in Microsoft Edge and press Ctrl+P. Print on A4, Margins: Default, Headers and footers: off.
+  Page 1 = Opening, page 2 = Closing. Print one sheet (both sides) per day and keep it with the Z-report.
+-->
+<style>
+  @page { size: A4; margin: 9mm 10mm; }
+  * { box-sizing: border-box; }
+  :root { --teal: #4E7F87; --mist: #EFF9FC; --line: #9bb5ba; --gold: #C9A24A; --sage: #8DA196; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", "Nirmala UI", Arial, sans-serif; font-size: 8.6pt; color: #1f2d30; line-height: 1.25;
+         -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #ddd; }
+  .page { width: 190mm; height: 277mm; margin: 8mm auto; background: #fff; padding: 0; overflow: hidden;
+          display: flex; flex-direction: column; page-break-after: always; break-after: page; }
+  .page:last-child { page-break-after: auto; break-after: auto; }
+  @media screen { .page { padding: 9mm 10mm; width: 210mm; height: 297mm; box-shadow: 0 2px 8px rgba(0,0,0,.25); } }
+  @media print { body { background: #fff; } .page { margin: 0; } .noprint { display: none; } }
+
+  header { display: flex; align-items: center; gap: 4mm; border-bottom: 2px solid var(--teal); padding-bottom: 2mm; margin-bottom: 2mm; }
+  header img { height: 15mm; }
+  header .title { flex: 1; }
+  header h1 { margin: 0; font-size: 17pt; color: var(--teal); letter-spacing: .3px; }
+  header .sub { color: var(--sage); font-size: 8pt; }
+  header .fields { display: grid; grid-template-columns: auto 34mm; gap: 1.2mm 2mm; align-items: end; font-size: 8.4pt; }
+  header .fields span:nth-child(odd) { text-align: right; color: #555; }
+
+  .blank { display: inline-block; border-bottom: 1px solid #555; min-width: 20mm; height: 3.8mm; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 3.5mm; flex: 1; }
+  .col { display: flex; flex-direction: column; gap: 2mm; }
+
+  section { border: 1px solid var(--line); border-radius: 2mm; padding: 1.6mm 2.2mm 2mm; }
+  section h2 { margin: 0 0 1.2mm; font-size: 9.6pt; color: #fff; background: var(--teal); border-radius: 1.2mm;
+               padding: .8mm 2mm; display: flex; justify-content: space-between; }
+  section h2 small { font-weight: normal; font-size: 7.6pt; opacity: .9; }
+  .hint { color: #5d6b6e; font-size: 7.4pt; margin: 0 0 1mm; }
+
+  ul.check { list-style: none; margin: 0; padding: 0; }
+  ul.check li { padding: .4mm 0 .4mm 5.2mm; position: relative; border-bottom: 1px dotted #cfdfe2; }
+  ul.check li:last-child { border-bottom: 0; }
+  ul.check li::before { content: ""; position: absolute; left: 0; top: .75mm; width: 3.2mm; height: 3.2mm;
+                        border: 1.2px solid var(--teal); border-radius: .6mm; background: #fff; }
+  ul.check li em { color: #5d6b6e; font-style: normal; font-size: 7.6pt; }
+
+  table { width: 100%; border-collapse: collapse; }
+  th, td { border: 1px solid var(--line); padding: .5mm 1.2mm; text-align: left; height: 4.6mm; }
+  th { background: var(--mist); color: var(--teal); font-size: 7.8pt; font-weight: 600; }
+  td.num, th.num { text-align: right; }
+  td.c, th.c { text-align: center; }
+  tr.total td { font-weight: 700; background: var(--mist); }
+  .mini td, .mini th { height: 4mm; }
+
+  .calc td:first-child { width: 7mm; text-align: center; font-weight: 700; color: var(--teal); }
+  .calc td:last-child { width: 26mm; }
+  .calc tr.key td { background: #fbf5e6; font-weight: 700; }
+  .lines div { border-bottom: 1px solid #b9c9cc; height: 4.8mm; }
+  .sign { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; margin-top: 1mm; }
+  .sign div { border-top: 1px solid #555; padding-top: .6mm; font-size: 7.6pt; color: #555; margin-top: 6mm; }
+  .grow { flex: 1; }
+  .note { font-size: 7.4pt; color: #5d6b6e; text-align: center; margin-top: 1mm; }
+  .noprint { max-width: 210mm; margin: 6mm auto 0; font-family: "Segoe UI", Arial, sans-serif; font-size: 11pt; background: #fff8e5;
+             border: 1px solid var(--gold); padding: 3mm 4mm; border-radius: 2mm; }
+  .noprint button { font-size: 11pt; padding: 1.5mm 4mm; background: var(--teal); color: #fff; border: 0; border-radius: 1.5mm; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="noprint">
+  <button onclick="window.print()">🖨 Print worksheet</button>
+  &nbsp;Print on A4. Page 1 is <b>Opening</b>, page 2 is <b>Closing</b>. Print both sides of one sheet for each day and staple the Z-report to it.
+</div>
+
+<!-- ============================== OPENING ============================== -->
+<div class="page">
+  <header>
+    <img src="../pos/assets/logo.png" alt="Bubble Blush">
+    <div class="title">
+      <h1>Opening Worksheet</h1>
+      <div class="sub">Bubble Blush · New Market, Khulna · Good Drinks, Brighter Days</div>
+    </div>
+    <div class="fields">
+      <span>Date</span><span class="blank"></span>
+      <span>Day</span><span class="blank"></span>
+      <span>Opened by</span><span class="blank"></span>
+      <span>Time in</span><span class="blank"></span>
+    </div>
+  </header>
+
+  <div class="cols">
+    <div class="col">
+      <section>
+        <h2>1. Shop &amp; safety <small>first 10 minutes</small></h2>
+        <ul class="check">
+          <li>Shutter and door opened, nothing missing or broken</li>
+          <li>Lights, fans and AC on</li>
+          <li>Fridge running and cold &nbsp;<em>Temp:</em> <span class="blank" style="min-width:12mm"></span> °C</li>
+          <li>Freezer running &nbsp;<em>Temp:</em> <span class="blank" style="min-width:12mm"></span> °C</li>
+          <li>Enough ice for the day (or ice ordered)</li>
+          <li>Drinking/filter water full</li>
+          <li>Gas cylinder: no smell of gas, enough left &nbsp;<em>Full / Half / Low</em></li>
+          <li>Cup sealing machine on and warmed up, film roll loaded</li>
+          <li>Hands washed, apron and hair cover on</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>2. POS &amp; printers</h2>
+        <ul class="check">
+          <li>Laptop on charge, POS opened with the <b>desktop shortcut</b></li>
+          <li>Settings shows <b>✓ Print helper is running</b></li>
+          <li>Bill printer has paper, and a spare roll is at the counter</li>
+          <li>Label (sticker) printer on and loaded <em>(if used)</em></li>
+          <li>bKash / Nagad phone charged, card machine on</li>
+          <li>Yesterday was closed (Z-report printed, backup saved)</li>
+          <li>Low-stock banner checked, items written in box 5</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>3. Opening float (cash in drawer)</h2>
+        <p class="hint">Count every note and coin. Write the total in the POS at closing (Reports → Close the day).</p>
+        <table class="mini">
+          <tr><th>Note / coin</th><th class="c">How many</th><th class="num">Amount ৳</th></tr>
+          <tr><td>৳1000</td><td></td><td></td></tr>
+          <tr><td>৳500</td><td></td><td></td></tr>
+          <tr><td>৳200</td><td></td><td></td></tr>
+          <tr><td>৳100</td><td></td><td></td></tr>
+          <tr><td>৳50</td><td></td><td></td></tr>
+          <tr><td>৳20</td><td></td><td></td></tr>
+          <tr><td>৳10</td><td></td><td></td></tr>
+          <tr><td>৳5 (notes + coins)</td><td></td><td></td></tr>
+          <tr><td>৳2 (notes + coins)</td><td></td><td></td></tr>
+          <tr><td>৳1 coins</td><td></td><td></td></tr>
+          <tr class="total"><td colspan="2">Opening float total</td><td></td></tr>
+        </table>
+        <p class="hint" style="margin-top:1mm">Counted by <span class="blank" style="min-width:28mm"></span> &nbsp; Checked by <span class="blank" style="min-width:28mm"></span></p>
+      </section>
+
+      <section class="grow">
+        <h2>4. Counter &amp; seating</h2>
+        <ul class="check">
+          <li>Counter, shaker area and tables wiped</li>
+          <li>Menu card and price list on display</li>
+          <li>Cups (Medium + Large), lids/film, straws and bags stocked at the counter</li>
+          <li>Bins empty with fresh bags, floor swept</li>
+          <li>Music on, shop ready to open &nbsp;<em>Open at:</em> <span class="blank" style="min-width:14mm"></span></li>
+        </ul>
+      </section>
+    </div>
+
+    <div class="col">
+      <section>
+        <h2>5. Prep for the day</h2>
+        <p class="hint">Write the time it was made and the time to throw it away. Make small batches on busy days instead of one big batch.</p>
+        <table class="mini">
+          <tr><th>Item</th><th class="c" style="width:15mm">Amount</th><th class="c" style="width:12mm">Made</th><th class="c" style="width:12mm">Use by</th><th class="c" style="width:9mm">Init.</th></tr>
+          <tr><td>Black tapioca pearls (cooked)</td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>Golden tapioca pearls (cooked)</td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>Jasmine green tea (brewed)</td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>Black tea (brewed)</td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>Sugar syrup</td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>Brown sugar syrup</td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>Cold foam / whipped cream</td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>Limes cut</td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        </table>
+      </section>
+
+      <section>
+        <h2>6. Stock check <small>tick OK or Low</small></h2>
+        <table class="mini">
+          <tr><th>Item</th><th class="c" style="width:9mm">OK</th><th class="c" style="width:9mm">Low</th><th>Item</th><th class="c" style="width:9mm">OK</th><th class="c" style="width:9mm">Low</th></tr>
+          <tr><td>Whole milk</td><td></td><td></td><td>Cups Medium</td><td></td><td></td></tr>
+          <tr><td>Evaporated milk</td><td></td><td></td><td>Cups Large</td><td></td><td></td></tr>
+          <tr><td>Whipping cream</td><td></td><td></td><td>Sealing film</td><td></td><td></td></tr>
+          <tr><td>Coconut milk</td><td></td><td></td><td>Boba straws</td><td></td><td></td></tr>
+          <tr><td>Creamer</td><td></td><td></td><td>Sticker labels</td><td></td><td></td></tr>
+          <tr><td>Tea leaves</td><td></td><td></td><td>Bill paper rolls</td><td></td><td></td></tr>
+          <tr><td>Fruit syrups</td><td></td><td></td><td>Carry bags</td><td></td><td></td></tr>
+          <tr><td>Fruit jams</td><td></td><td></td><td>Popping balls</td><td></td><td></td></tr>
+          <tr><td>Taro / choco powder</td><td></td><td></td><td>Crystal balls</td><td></td><td></td></tr>
+          <tr><td>Sauces &amp; Biscoff</td><td></td><td></td><td>Coconut / coffee jelly</td><td></td><td></td></tr>
+          <tr><td>Dry pearls</td><td></td><td></td><td>Tissue &amp; cleaning</td><td></td><td></td></tr>
+        </table>
+      </section>
+
+      <section>
+        <h2>7. Need to buy today</h2>
+        <div class="lines"><div></div><div></div><div></div><div></div></div>
+      </section>
+
+      <section class="grow">
+        <h2>8. Notes &amp; problems</h2>
+        <p class="hint">Broken equipment, missing stock, anything the owner should know.</p>
+        <div class="lines"><div></div><div></div><div></div></div>
+        <div class="sign">
+          <div>Opened by (sign)</div>
+          <div>Manager / owner check (sign)</div>
+        </div>
+      </section>
+    </div>
+  </div>
+  <div class="note">Opening done? Turn over at closing time.</div>
+</div>
+
+<!-- ============================== CLOSING ============================== -->
+<div class="page">
+  <header>
+    <img src="../pos/assets/logo.png" alt="Bubble Blush">
+    <div class="title">
+      <h1>Closing Worksheet</h1>
+      <div class="sub">Bubble Blush · Staple today's Z-report to this sheet</div>
+    </div>
+    <div class="fields">
+      <span>Date</span><span class="blank"></span>
+      <span>Closed by</span><span class="blank"></span>
+      <span>Last order at</span><span class="blank"></span>
+      <span>Time out</span><span class="blank"></span>
+    </div>
+  </header>
+
+  <div class="cols">
+    <div class="col">
+      <section>
+        <h2>1. Before you count <small>in the POS</small></h2>
+        <ul class="check">
+          <li>Every order in the "Making now" bar marked <b>Ready ✓</b></li>
+          <li>No unpaid orders left (<b>💰 Pay</b>), or written in box 8 with the reason</li>
+          <li>Today's expenses entered in <b>Expenses</b> (gas, cleaning, delivery…)</li>
+          <li>Waste and staff drinks entered in <b>Inventory → − Waste</b></li>
+          <li>Wrong orders voided (with PIN)</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>2. Today's sales <small>Reports → Today</small></h2>
+        <table class="mini">
+          <tr><th>From the POS</th><th class="num" style="width:30mm">Amount</th></tr>
+          <tr><td>Orders</td><td></td></tr>
+          <tr><td>Cups sold</td><td></td></tr>
+          <tr><td>Cash sales ৳</td><td></td></tr>
+          <tr><td>bKash ৳</td><td></td></tr>
+          <tr><td>Nagad ৳</td><td></td></tr>
+          <tr><td>Card ৳</td><td></td></tr>
+          <tr class="total"><td>Total sales ৳</td><td></td></tr>
+          <tr><td>Complimentary given (value) ৳</td><td></td></tr>
+          <tr><td>Discounts given ৳</td><td></td></tr>
+          <tr><td>Voided orders (how many)</td><td></td></tr>
+        </table>
+        <ul class="check" style="margin-top:1mm">
+          <li>bKash and Nagad totals match the phone app</li>
+          <li>Card total matches the card machine</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>3. Expenses paid today</h2>
+        <table class="mini">
+          <tr><th>What</th><th class="num" style="width:16mm">৳</th><th class="c" style="width:13mm">From drawer</th><th class="c" style="width:12mm">In POS</th></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr class="total"><td>Total from drawer</td><td></td><td colspan="2"></td></tr>
+        </table>
+      </section>
+
+      <section class="grow">
+        <h2>4. Waste, staff drinks &amp; leftover prep</h2>
+        <table class="mini">
+          <tr><th>Item</th><th class="c" style="width:14mm">Amount</th><th>Reason</th><th class="c" style="width:12mm">In POS</th></tr>
+          <tr><td>Cooked pearls thrown away</td><td></td><td></td><td></td></tr>
+          <tr><td>Brewed tea thrown away</td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+        </table>
+      </section>
+    </div>
+
+    <div class="col">
+      <section>
+        <h2>5. Cash count</h2>
+        <table class="mini">
+          <tr><th>Note / coin</th><th class="c">How many</th><th class="num">Amount ৳</th></tr>
+          <tr><td>৳1000</td><td></td><td></td></tr>
+          <tr><td>৳500</td><td></td><td></td></tr>
+          <tr><td>৳200</td><td></td><td></td></tr>
+          <tr><td>৳100</td><td></td><td></td></tr>
+          <tr><td>৳50</td><td></td><td></td></tr>
+          <tr><td>৳20</td><td></td><td></td></tr>
+          <tr><td>৳10</td><td></td><td></td></tr>
+          <tr><td>৳5 (notes + coins)</td><td></td><td></td></tr>
+          <tr><td>৳2 (notes + coins)</td><td></td><td></td></tr>
+          <tr><td>৳1 coins</td><td></td><td></td></tr>
+          <tr class="total"><td colspan="2">Cash counted</td><td></td></tr>
+        </table>
+      </section>
+
+      <section>
+        <h2>6. Does the drawer match?</h2>
+        <table class="calc mini">
+          <tr><td>A</td><td>Opening float (from the opening sheet)</td><td></td></tr>
+          <tr><td>B</td><td>+ Cash sales (box 2)</td><td></td></tr>
+          <tr><td>C</td><td>− Expenses paid from drawer (box 3)</td><td></td></tr>
+          <tr class="key"><td>D</td><td>= Cash that should be there (A + B − C)</td><td></td></tr>
+          <tr><td>E</td><td>Cash counted (box 5)</td><td></td></tr>
+          <tr class="key"><td>F</td><td>Difference (E − D) &nbsp;<em style="font-weight:normal">over + / short −</em></td><td></td></tr>
+          <tr><td>G</td><td>Float left in drawer for tomorrow</td><td></td></tr>
+          <tr><td>H</td><td>Cash handed to owner (E − G)</td><td></td></tr>
+        </table>
+        <p class="hint" style="margin-top:1mm">Enter A and E in <b>Reports → Close the day</b>; the POS checks the same sum. Explain any difference in box 8.</p>
+        <p class="hint">Cash received by (owner) <span class="blank" style="min-width:36mm"></span></p>
+      </section>
+
+      <section>
+        <h2>7. Close the POS &amp; shop</h2>
+        <ul class="check">
+          <li><b>Close the day</b> done, Z-report printed and stapled here</li>
+          <li>Backup file copied from <em>Downloads</em> to Google Drive / WhatsApp</li>
+          <li>Pearl pot, shakers, jugs, tea brewer and scoops washed</li>
+          <li>Sealing machine cleaned, switched off and unplugged</li>
+          <li>Fridge wiped, jars closed and dated, door shut</li>
+          <li>Counter and tables wiped, floor mopped, bins emptied</li>
+          <li>Gas off · printers and laptop off · lights, fans and AC off</li>
+          <li>Cash locked away or handed over, door and shutter locked</li>
+        </ul>
+      </section>
+
+      <section class="grow">
+        <h2>8. Notes for tomorrow</h2>
+        <p class="hint">Unpaid orders, cash difference, low stock, customer complaints, broken equipment.</p>
+        <div class="lines"><div></div><div></div><div></div></div>
+        <div class="sign">
+          <div>Closed by (sign)</div>
+          <div>Manager / owner check (sign)</div>
+        </div>
+      </section>
+    </div>
+  </div>
+  <div class="note">Thank you for today! 🧋</div>
+</div>
+
+</body>
+</html>
