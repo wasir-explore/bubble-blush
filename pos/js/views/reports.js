@@ -138,12 +138,26 @@ Views.reports = (() => {
 
     r.hours = Array.from({ length: 24 }, (_, h) => ({ h, orders: 0, sales: 0 }));
     paid.forEach((o) => { const h = new Date(o.at).getHours(); r.hours[h].orders++; r.hours[h].sales += o.total; });
+    // Sold cups in one order (whole drinks given free are not sold cups).
+    const soldOf = (o) => U.n(o.cups) - U.sum(o.lines, (l) => (Store.isFreeCup(l) ? l.qty : 0));
     const days = {};
-    paid.forEach((o) => { days[o.dayKey] = days[o.dayKey] || { day: o.dayKey, orders: 0, sales: 0 }; days[o.dayKey].orders++; days[o.dayKey].sales += o.total; });
+    paid.forEach((o) => {
+      const d = days[o.dayKey] = days[o.dayKey] || { day: o.dayKey, orders: 0, sales: 0, cups: 0 };
+      d.orders++; d.sales += o.total; d.cups += soldOf(o);
+    });
     r.days = days;
-    const wk = Array.from({ length: 7 }, (_, i) => ({ i, sales: 0, days: new Set() }));
-    paid.forEach((o) => { const d = U.parseDay(o.dayKey).getDay(); wk[d].sales += o.total; wk[d].days.add(o.dayKey); });
+    const wk = Array.from({ length: 7 }, (_, i) => ({ i, sales: 0, cups: 0, days: new Set() }));
+    paid.forEach((o) => { const d = U.parseDay(o.dayKey).getDay(); wk[d].sales += o.total; wk[d].cups += soldOf(o); wk[d].days.add(o.dayKey); });
     r.weekdays = wk;
+    // Hours the shop was selling: each (day, hour) with at least one paid order.
+    r.openHours = new Set(paid.map((o) => `${o.dayKey}|${new Date(o.at).getHours()}`)).size;
+    // Sold cups per drink, for "average cups per day" by drink.
+    const sold = {};
+    paid.forEach((o) => o.lines.forEach((l) => {
+      if (Store.isToppingLine(l) || Store.isFreeCup(l)) return;
+      sold[l.name] = (sold[l.name] || 0) + l.qty;
+    }));
+    r.drinkSold = Object.entries(sold).map(([name, qty]) => ({ name, qty })).sort((a, b) => b.qty - a.qty);
 
     const usage = {};
     moves.filter((m) => m.type === 'sale' || m.type === 'void').forEach((m) => {
@@ -230,6 +244,29 @@ Views.reports = (() => {
       <p class="muted small mt">Paid orders only; complimentary cups are included.</p>`;
   }
 
+  /* Average cups: sold cups (complimentary cups left out) per day, order, open hour, weekday and drink. */
+  function avgCups(r, single, nDays, WD) {
+    if (!r.soldCups) return '<p class="muted">No cups sold yet.</p>';
+    const avg = (n, d) => U.qty(d ? Math.round((n / d) * 10) / 10 : 0);
+    const open = Object.keys(r.days).length;
+    const dayList = Object.values(r.days);
+    const best = dayList.reduce((a, b) => (b.cups > a.cups ? b : a), dayList[0]);
+    const row = (l, v, small = '') => `<div class="tot-row"><span>${l}${small ? ` <small class="muted">${small}</small>` : ''}</span><span><b>${v}</b></span></div>`;
+    const wk = r.weekdays.filter((w) => w.days.size);
+    return `
+      ${single ? row('Cups today', r.soldCups) : row('Per day open', avg(r.soldCups, open), `${open} of ${nDays} days had sales`)}
+      ${!single && open < nDays ? row('Per calendar day', avg(r.soldCups, nDays), `all ${nDays} days`) : ''}
+      ${row('Per order', avg(r.soldCups, r.orders), `${r.orders} orders`)}
+      ${row('Per selling hour', avg(r.soldCups, r.openHours), `${r.openHours} hour${r.openHours === 1 ? '' : 's'} with sales`)}
+      ${!single && best ? row('Best day', `${best.cups} cups`, U.fmtDay(best.day)) : ''}
+      ${!single && nDays >= 7 && wk.length ? `<h3 class="mt">By weekday <small class="muted">avg cups per day</small></h3>${bars(wk, (w) => WD[w.i], (w) => w.cups / w.days.size, (v) => avg(v, 1))}` : ''}
+      ${single ? '' : `<h3 class="mt">By drink <small class="muted">avg cups per day open</small></h3>
+      <table class="tbl compact"><thead><tr><th>Drink</th><th class="r">Sold</th><th class="r">Per day</th></tr></thead>
+        <tbody>${r.drinkSold.slice(0, 10).map((d) => `<tr><td>${U.esc(d.name)}</td><td class="r">${d.qty}</td><td class="r">${avg(d.qty, open)}</td></tr>`).join('')}</tbody></table>
+      ${r.drinkSold.length > 10 ? '<p class="muted small mt">Top 10 drinks shown.</p>' : ''}`}
+      <p class="muted small mt">Sold cups only; complimentary cups are left out.</p>`;
+  }
+
   function draw() {
     const { r, close } = data;
     const [from, to] = range;
@@ -272,6 +309,7 @@ Views.reports = (() => {
           : '<p class="muted">No sales yet.</p>'}
           ${r.topItems.length > 3 ? `<p class="muted small mt">Slowest: ${r.topItems.slice(-3).reverse().map((i) => `${U.esc(i.name)} (${i.qty})`).join(', ')}</p>` : ''}</div>
         <div class="card"><h3>🥤 Cups by size</h3><div id="rCups">${cupsBySize(r)}</div></div>
+        <div class="card"><h3>📊 Average cups</h3>${avgCups(r, single, nDays, WD)}</div>
         <div class="card"><h3>⏰ Busy hours</h3>${hourSpan.length ? bars(hourSpan, (h) => `${((h.h + 11) % 12) + 1}${h.h < 12 ? 'am' : 'pm'}`, (h) => h.orders, (v) => `${v} orders`) : '<p class="muted">No sales yet.</p>'}</div>
         <div class="card"><h3>💳 Payments</h3>${r.payments.length ? bars(r.payments, (p) => `${U.esc(p.method)} <small>(${p.count})</small>`, (p) => p.amount) : '<p class="muted">No payments yet.</p>'}
           <h3 class="mt">🛍 Order type</h3>${r.orderTypes.length ? bars(r.orderTypes, (t) => `${U.esc(t.name)} <small>(${t.count})</small>`, (t) => t.amount) : '<p class="muted">—</p>'}</div>
