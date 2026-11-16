@@ -22,6 +22,7 @@ Sizes: Medium = 350 ml (cup, lid and straw ৳21). Large = 500 ml (৳23). Overh
 | Creamer, chocolate, taro | invoices | ৳1.00, ৳1.25, ৳1.10 per g |
 | Jam (mango, strawberry, mulberry) | invoices, ৳1,800 per 1.2 kg | ৳1.50/g |
 | Blueberry jam | owner: ৳1,800 (size assumed 1.2 kg) | ৳1.50/g |
+| Biscoff spread | ৳900 per 400 g | ৳2.25/g |
 | Jasmine tea | ৳2,000 per 500 g | ৳4.00/g |
 | Coconut jelly | = "Original Coconut Topping" | ৳0.95/g (1 kg) or ৳1.12/g (2.5 kg bucket) |
 
@@ -46,11 +47,12 @@ Sizes: Medium = 350 ml (cup, lid and straw ৳21). Large = 500 ml (৳23). Overh
 | Brown Sugar Milk Tea | M | 42 | 96 | 190 | 94 | 49% | 98% |
 | Brown Sugar Milk Tea | L | 69 | 125 | 230 | 105 | 45% | 83% |
 | Premium Brown Sugar | L | 118 | 174 | 300 | 126 | 42% | 72% |
-| Biscoff Cookie Crumble | M | 90 | 170 | 240 | 70 | 29% | 41% |
-| Biscoff Cookie Crumble | L | 126 | 210 | 290 | 80 | 28% | 38% |
+| Biscoff Cookie Crumble | M | 90 | 144 | 240 | 96 | 40% | 67% |
+| Biscoff Cookie Crumble | L | 126 | 182 | 290 | 108 | 37% | 59% |
 
 Notes:
 - Triple Choco and Carnation use the quantities on the owner's costing pages (confirmed as current). The Carnation result matches the owner's own total (৳229 and ৳289).
 - Triple Choco includes ৳10 for chocolate syrup, as on the sheet. The ৳10 tapioca is not included.
-- Biscoff uses the totals on the owner's sheet (M 90 + 23 + 55 + 2 = 170, L 126 + 25 + 55 + 2 = 210), which are not built up from unit prices. The sheet's extra amounts (23/25, 55, 2) do not match the ৳33 overhead + cup used elsewhere.
+- Biscoff uses the owner's totals: M 90 + 21 + 33 = 144, L 126 + 23 + 33 = 182. **Check needed:** Biscoff spread costs ৳900 per 400 g (৳2.25/g), so 40 g = ৳90 and 56 g = ৳126. These match the sheet's "90" and "126" exactly, so those numbers may be the spread alone. If so, add whipping cream (100 ml = ৳30), milk (90 ml = ৳11) and vanilla (5 ml), which makes Medium cost about ৳189 (margin about 21%).
+- Overhead ৳33 per cup covers water, electricity and rent. It does not include wages.
 - Recipes still missing: Peach, Mango, Passion Fruit and Strawberry & Lime Jasmine Tea, Lychee Paradise, Passion in Paradise, Mulberry Bliss, Blueberry Snow Bliss.
