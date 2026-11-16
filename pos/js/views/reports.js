@@ -367,7 +367,7 @@ Views.reports = (() => {
         m.close();
         U.toast('Day closed. Great work today! 💙');
         if (doBackup) await App.backupNow();
-        if (doPrint) await Print.dayReport({ ...r, title: 'End of day (Z) report', range: U.fmtDay(day), ...rec });
+        if (doPrint) await Print.dayReport({ ...r, title: 'End of day (Z) report', range: U.fmtDay(day), ...rec, noProfit: true });
         load();
         return true;
       } }],

@@ -177,7 +177,7 @@ const Receipt = (() => {
       (r.compBy || []).forEach((c) => ops.push({ t: 'row', l: `${c.reason} (${c.orders})`, r: `${m(c.value)} / cost ${m(c.cost)}`, z: 0.9 }));
       ops.push({ t: 'row', l: 'Menu value given', r: m(r.comp) });
       ops.push({ t: 'row', l: 'Cost to the shop', r: m(r.compCost), b: true });
-      ops.push({ t: 'text', s: '(cost is already inside Ingredient cost)', z: 0.8 });
+      if (!r.noProfit) ops.push({ t: 'text', s: '(cost is already inside Ingredient cost)', z: 0.8 });
     }
     ops.push({ t: 'hr' }, { t: 'text', s: 'Cash drawer', b: true });
     ops.push({ t: 'row', l: 'Opening cash', r: m(r.openingCash || 0) });
@@ -188,11 +188,14 @@ const Receipt = (() => {
       ops.push({ t: 'row', l: 'Counted', r: m(r.countedCash) });
       ops.push({ t: 'row', l: 'Difference', r: m(r.countedCash - r.expectedCash), b: true });
     }
-    ops.push({ t: 'hr' }, { t: 'text', s: 'Profit (estimate)', b: true });
-    ops.push({ t: 'row', l: 'Ingredient cost', r: m(r.cogs) });
-    ops.push({ t: 'row', l: 'Gross profit', r: m(r.grossProfit), b: true });
-    ops.push({ t: 'row', l: 'Expenses', r: m(r.expenses) });
-    ops.push({ t: 'row', l: 'Net profit', r: m(r.netProfit), b: true });
+    // The end-of-day (Z) report leaves profit out (r.noProfit); the owner sees it on the Reports screen.
+    if (!r.noProfit) {
+      ops.push({ t: 'hr' }, { t: 'text', s: 'Profit (estimate)', b: true });
+      ops.push({ t: 'row', l: 'Ingredient cost', r: m(r.cogs) });
+      ops.push({ t: 'row', l: 'Gross profit', r: m(r.grossProfit), b: true });
+      ops.push({ t: 'row', l: 'Expenses', r: m(r.expenses) });
+      ops.push({ t: 'row', l: 'Net profit', r: m(r.netProfit), b: true });
+    }
     ops.push({ t: 'hr' }, { t: 'text', s: 'Top items', b: true });
     r.topItems.slice(0, 10).forEach((i) => ops.push({ t: 'row', l: `${i.qty} × ${i.name}`, r: m(i.sales) }));
     if (r.note) ops.push({ t: 'hr' }, { t: 'text', s: `Note: ${r.note}` });
