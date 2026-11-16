@@ -120,7 +120,7 @@ const Receipt = (() => {
       if (l.ice) ops.push({ t: 'text', s: `Ice: ${l.ice}`, z: 1.15, i: 1 });
       // Included toppings are part of the drink: print them like toppings so they are not missed.
       Store.lineIncluded(l).forEach((n) => ops.push({ t: 'text', s: `+ ${n} (included)`, b: true, z: 1.15, i: 1 }));
-      (l.toppings || []).forEach((tp) => ops.push({ t: 'text', s: `+ ${Store.topQty(tp) > 1 ? `DOUBLE ${tp.name} (x2)` : tp.name}`, b: true, z: 1.15, i: 1 }));
+      (l.toppings || []).forEach((tp) => ops.push({ t: 'text', s: `+ ${Store.topQty(tp) > 1 ? `${Store.portionWord(Store.topQty(tp)).toUpperCase()} ${tp.name} (x${Store.topQty(tp)})` : tp.name}`, b: true, z: 1.15, i: 1 }));
       if (l.note) ops.push({ t: 'text', s: `NOTE: ${l.note}`, b: true, z: 1.15, i: 1 });
     });
     const note = String(order.note || '').split(' · ').filter((x) => !/^TrxID:/.test(x)).join(' · ');

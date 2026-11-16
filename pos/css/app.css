@@ -342,6 +342,10 @@ label.check input { width: 18px; height: 18px; accent-color: var(--teal-dd); }
 .sum-top.dbl { background: #FBF0D9; font-weight: 700; }
 .dbl-btn { border: 1px solid var(--line); background: #fff; border-radius: 6px; padding: 0 6px; font-size: 12px; font-weight: 800; cursor: pointer; color: var(--teal-dd); }
 .dbl-btn.on { background: var(--gold); border-color: var(--gold); color: #fff; }
+.dbl-btn:disabled { opacity: .35; cursor: default; }
+.portion { display: inline-flex; align-items: center; gap: 3px; }
+.portion b { min-width: 22px; text-align: center; font-size: 12px; color: var(--teal-dd); }
+.portion b.on { background: var(--gold); color: #fff; border-radius: 6px; padding: 0 4px; }
 .cust-fields { position: relative; }
 .cust-sug { position: absolute; left: 0; right: 0; top: 100%; z-index: 20; background: #fff; border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); max-height: 260px; overflow: auto; margin-top: 2px; }
 .cs-item { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; width: 100%; text-align: left; border: 0; border-bottom: 1px solid #EDF3F5; background: #fff; padding: 8px 12px; cursor: pointer; font: inherit; font-size: 14px; }

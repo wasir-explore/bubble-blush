@@ -203,7 +203,7 @@ const Store = (() => {
     /* Per-cup discount: the most expensive topping the customer added (included toppings are never charged).
        Complimentary toppings are already free, so the promotion picks from the others. */
     linePromo(line, active = api.promoActive()) {
-      // Only drinks get the free topping (not "extra topping only" lines). One portion is free, even on a double.
+      // Only drinks get the free topping (not "extra topping only" lines). One portion is free, even on a double or triple.
       const tops = line.toppings || [];
       const paid = tops.map((t, i) => i).filter((i) => !tops[i].comp);
       if (!active || api.isToppingLine(line) || line.compDrink || !paid.length) return { amount: 0, index: -1 };
@@ -250,9 +250,11 @@ const Store = (() => {
     lineNetUnit(line, promoOn = api.promoActive()) { return api.lineUnitPrice(line) - api.linePromo(line, promoOn).amount - api.lineComp(line); },
     /* Price that hits a target food-cost %, rounded up to the next ৳10. */
     suggestPrice(cost, target = 0.3) { return cost > 0 ? Math.ceil(cost / target / 10) * 10 : 0; },
-    /* A topping on a line can be single (1) or double (2) portion. */
-    topQty(t) { return U.n(t?.qty) >= 2 ? 2 : 1; },
-    topName(t) { return api.topQty(t) > 1 ? `${t.name} ×2 (double)` : t.name; },
+    /* Portions of a topping on a line: 1 (single), 2 (double), 3 (triple), 4 (quadruple)… up to TOP_MAX. */
+    TOP_MAX: 10,
+    topQty(t) { return Math.min(api.TOP_MAX, Math.max(1, Math.floor(U.n(t?.qty)) || 1)); },
+    portionWord(q) { return ({ 2: 'double', 3: 'triple', 4: 'quadruple' })[q] || `${q} portions`; },
+    topName(t) { const q = api.topQty(t); return q > 1 ? `${t.name} ×${q} (${api.portionWord(q)})` : t.name; },
     /* "Extra topping only" line: toppings sold without a drink (e.g. added after the drink was served). */
     isToppingLine(l) { return l?.kind === 'topping'; },
     /* Drinks only; extra-topping lines are not cups. */

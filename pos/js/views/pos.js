@@ -163,7 +163,7 @@ Views.pos = (() => {
     const body = document.createElement('div');
     body.className = 'opt';
     body.innerHTML = `
-      ${topOnly ? '<p class="muted">For toppings without a drink, e.g. the customer wants extra topping after the bill or after the drink was given. Pick the toppings; tap <b>×2</b> for a double portion.</p>' : ''}
+      ${topOnly ? '<p class="muted">For toppings without a drink, e.g. the customer wants extra topping after the bill or after the drink was given. Pick the toppings; tap <b>+</b> for a double, triple or more portions.</p>' : ''}
       ${item?.badge ? `<span class="ic-badge big">${U.esc(Store.badgeText(item.badge))}</span>` : ''}
       ${item?.desc ? `<p class="muted">${U.esc(item.desc)}</p>` : ''}
       ${included.length ? `<p class="incl">✓ Included: <b>${included.map(U.esc).join(', ')}</b> <small class="muted">(no extra charge)</small></p>` : ''}
@@ -210,15 +210,20 @@ Views.pos = (() => {
       if (tr) tr.textContent = topOnly && !line.toppings.length ? '· choose at least one' : '';
       addBtn.disabled = !ready();
       addBtn.textContent = !ready() ? (topOnly ? 'Choose a topping first' : 'Choose a size first') : `${existing ? 'Update' : 'Add to order'} — ${U.money(net)}`;
-      // Selected toppings: tap ×2 to make it a double portion (double price, double stock),
+      // Selected toppings: tap − / + to set the portions (×2 double, ×3 triple, ×4…; price and stock go up with it),
       // 🎁 to make it complimentary (free, still taken from stock).
       U.$('#optSum', body).innerHTML = line.toppings.map((t, i) => {
         const free = i === pr.index && pr.amount;
-        const dbl = Store.topQty(t) > 1;
+        const q = Store.topQty(t);
+        const dbl = q > 1;
         const comp = !!t.comp;
-        return `<span class="sum-top ${free ? 'free' : ''} ${dbl ? 'dbl' : ''} ${comp ? 'comp' : ''}">+ ${U.esc(t.name)}${dbl ? ' ×2' : ''}
-          ${comp ? `<s>${U.money(topPrice(t))}</s> COMPLIMENTARY` : free ? `<s>${U.money(topPrice(t))}</s> ${dbl ? U.money(t.price) : 'FREE'}` : U.money(topPrice(t))}
-          <button type="button" class="dbl-btn ${dbl ? 'on' : ''}" data-dbl="${i}" title="${dbl ? 'Back to single portion' : 'Double portion'}">×2</button>
+        return `<span class="sum-top ${free ? 'free' : ''} ${dbl ? 'dbl' : ''} ${comp ? 'comp' : ''}">+ ${U.esc(t.name)}${dbl ? ` ×${q}` : ''}
+          ${comp ? `<s>${U.money(topPrice(t))}</s> COMPLIMENTARY` : free ? `<s>${U.money(topPrice(t))}</s> ${dbl ? U.money(t.price * (q - 1)) : 'FREE'}` : U.money(topPrice(t))}
+          <span class="portion">
+            <button type="button" class="dbl-btn" data-tq="${i}" data-d="-1" ${q <= 1 ? 'disabled' : ''} title="One portion less">−</button>
+            <b class="${dbl ? 'on' : ''}" title="${dbl ? U.esc(Store.portionWord(q)) : 'single'} portion">×${q}</b>
+            <button type="button" class="dbl-btn" data-tq="${i}" data-d="1" ${q >= Store.TOP_MAX ? 'disabled' : ''} title="One portion more (double, triple, …)">+</button>
+          </span>
           <button type="button" class="comp-btn ${comp ? 'on' : ''}" data-comp="${i}" title="${comp ? 'Charge this topping again' : 'Complimentary: give this topping free'}">🎁</button></span>`;
       }).join('');
     };
@@ -230,10 +235,10 @@ Views.pos = (() => {
       U.$$('.size-btn', body).forEach((b) => b.classList.toggle('on', b.dataset.size === sizeId));
     };
     body.addEventListener('click', (e) => {
-      const db = e.target.closest('[data-dbl]');
+      const db = e.target.closest('[data-tq]');
       if (db) {
-        const t = line.toppings[Number(db.dataset.dbl)];
-        if (t) t.qty = Store.topQty(t) > 1 ? 1 : 2;
+        const t = line.toppings[Number(db.dataset.tq)];
+        if (t) t.qty = Math.min(Store.TOP_MAX, Math.max(1, Store.topQty(t) + Number(db.dataset.d)));
         refresh();
         return;
       }
