@@ -56,3 +56,20 @@ Notes:
 - Biscoff uses the owner's totals: M 90 + 21 + 33 = 144, L 126 + 23 + 33 = 182. **Check needed:** Biscoff spread costs ৳900 per 400 g (৳2.25/g), so 40 g = ৳90 and 56 g = ৳126. These match the sheet's "90" and "126" exactly, so those numbers may be the spread alone. If so, add whipping cream (100 ml = ৳30), milk (90 ml = ৳11) and vanilla (5 ml), which makes Medium cost about ৳189 (margin about 21%).
 - Overhead ৳33 per cup covers water, electricity and rent. It does not include wages.
 - Recipes still missing: Peach, Mango, Passion Fruit and Strawberry & Lime Jasmine Tea, Lychee Paradise, Passion in Paradise, Mulberry Bliss, Blueberry Snow Bliss.
+
+## Toppings (one serving per drink)
+
+Serving sizes from the owner. Golden tapioca is discontinued (it is still in the POS and needs removing). The POS has one price per topping for both sizes, and none of these costs include overhead or cup.
+
+| Topping | Price per g | Medium | Large | POS price | Profit M | Profit L |
+|---|---|---|---|---|---|---|
+| Black tapioca | ৳0.50 (dry, ৳500/kg) | 40 g = ৳20.0 | 55 g = ৳27.5 | ৳20 | ৳0.0 | −৳7.5 |
+| Crystal ball | ৳1.10 (৳1,100/kg) | 32 g = ৳35.2 | 45 g = ৳49.5 | ৳40 | ৳4.8 | −৳9.5 |
+| Popping ball | ৳1.417 (strawberry, ৳1,700 per 1.2 kg) | 32 g = ৳45.3 | 42 g = ৳59.5 | ৳50 | ৳4.7 | −৳9.5 |
+| Coconut jelly | ৳0.95 (1 kg, ৳950) | 30 g = ৳28.5 | 43 g = ৳40.9 | ৳30 | ৳1.5 | −৳10.9 |
+
+Notes:
+- Crystal ball price is the cold cream and strawberry flavours (both ৳1,100/kg). Pomelo has no invoice.
+- Popping ball price is strawberry only. Mango, passion fruit and lychee have no invoice.
+- Coconut jelly from the 2.5 kg bucket (৳2,800) would cost ৳1.12/g, so ৳33.6 (M) and ৳48.2 (L).
+- Unconfirmed: whether the tapioca weights are dry or cooked. The owner's Triple Choco sheet used ৳10 for tapioca, which is 20 g dry.
