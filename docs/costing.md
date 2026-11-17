@@ -63,7 +63,7 @@ Serving sizes from the owner. Golden tapioca is discontinued (it is still in the
 
 | Topping | Price per g | Medium | Large | POS price | Profit M | Profit L |
 |---|---|---|---|---|---|---|
-| Black tapioca | ৳0.50 (dry, ৳500/kg) | 40 g = ৳20.0 | 55 g = ৳27.5 | ৳20 | ৳0.0 | −৳7.5 |
+| Black tapioca (cooked) | ৳0.25 per cooked g (dry ৳0.50/g, cooked weight 2× dry) | 40 g = ৳10.0 | 55 g = ৳13.75 | ৳20 | ৳10.0 | ৳6.25 |
 | Crystal ball | ৳1.10 (৳1,100/kg) | 32 g = ৳35.2 | 45 g = ৳49.5 | ৳40 | ৳4.8 | −৳9.5 |
 | Popping ball | ৳1.417 (strawberry, ৳1,700 per 1.2 kg) | 32 g = ৳45.3 | 42 g = ৳59.5 | ৳50 | ৳4.7 | −৳9.5 |
 | Coconut jelly | ৳0.95 (1 kg, ৳950) | 30 g = ৳28.5 | 43 g = ৳40.9 | ৳30 | ৳1.5 | −৳10.9 |
@@ -72,4 +72,4 @@ Notes:
 - Crystal ball price is the cold cream and strawberry flavours (both ৳1,100/kg). Pomelo has no invoice.
 - Popping ball price is strawberry only. Mango, passion fruit and lychee have no invoice.
 - Coconut jelly from the 2.5 kg bucket (৳2,800) would cost ৳1.12/g, so ৳33.6 (M) and ৳48.2 (L).
-- Unconfirmed: whether the tapioca weights are dry or cooked. The owner's Triple Choco sheet used ৳10 for tapioca, which is 20 g dry.
+- Black tapioca: the owner's 40 g and 55 g are cooked weights. Dry tapioca costs ৳500/kg. A working yield of 2× (1 kg dry gives about 2 kg cooked) gives ৳0.25 per cooked g, and it matches the ৳10 the owner's Triple Choco sheet used. Other cooked-weight yields would give, for M/L: 2.5× = ৳8.0/৳11.0, 3× = ৳6.7/৳9.2. **To confirm:** weigh 1 kg dry tapioca after boiling and soaking in syrup.
